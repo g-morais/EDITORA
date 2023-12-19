@@ -1,0 +1,666 @@
+-- Definir o banco de dados padrão
+CREATE DATABASE IF NOT EXISTS Editora DEFAULT CHARACTER SET utf8;
+USE Editora;
+
+-- TABELA LIVRO
+CREATE TABLE IF NOT EXISTS Livro (
+  ISBN VARCHAR(15) NOT NULL,
+  titulo VARCHAR(40) NOT NULL,
+  Editora VARCHAR(20) NOT NULL,
+  data_de_publicacao DATE NOT NULL,
+  Numero_de_paginas INT NOT NULL,
+  Genero VARCHAR(20) NULL,
+  descricao VARCHAR(100) NULL,
+  autor VARCHAR(30) NOT NULL,
+  PRIMARY KEY (ISBN)
+) ENGINE = InnoDB;
+
+-- TABELA CLIENTE
+CREATE TABLE IF NOT EXISTS cliente (
+  CPF VARCHAR(15) NOT NULL,
+  email VARCHAR(30) UNIQUE NOT NULL,
+  nome VARCHAR(30) NOT NULL,
+  endereco VARCHAR(30) NULL,
+  PRIMARY KEY (CPF)
+) ENGINE = InnoDB;
+
+-- TABELA PEDIDOS E VENDAS
+CREATE TABLE IF NOT EXISTS pedidos_vendas (
+  ID VARCHAR(15) NOT NULL,
+  `data` DATE NOT NULL,
+  `status` VARCHAR(30) NOT NULL,
+  detalhe VARCHAR(60) NULL,
+  CPF_cliente VARCHAR(15) NOT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (CPF_cliente) REFERENCES cliente (CPF)
+) ENGINE = InnoDB;
+
+-- TABELA DEPARTAMENTO
+CREATE TABLE IF NOT EXISTS departamento (
+  ID VARCHAR(15) NOT NULL,
+  nome VARCHAR(25) NOT NULL,
+  responsavel VARCHAR(20) NOT NULL,
+  descricao VARCHAR(100) NULL,
+  PRIMARY KEY (ID)
+) ENGINE = InnoDB;
+
+-- TABELA FUNCIONARIO
+CREATE TABLE IF NOT EXISTS funcionario (
+  ID VARCHAR(15) NOT NULL,
+  nome VARCHAR(25) NOT NULL,
+  telefone VARCHAR(15) NULL,
+  endereco VARCHAR(30) NULL,
+  cargo VARCHAR(50) NOT NULL,
+  ID_departamento VARCHAR(15) NOT NULL,
+  ID_pedidos_vendas VARCHAR(15) NOT NULL,
+  PRIMARY KEY (ID),
+  FOREIGN KEY (ID_departamento) REFERENCES departamento (ID),
+  FOREIGN KEY (ID_pedidos_vendas) REFERENCES pedidos_vendas (ID)
+) ENGINE = InnoDB;
+
+-- TABELA AREA DE CONHECIMENTO
+CREATE TABLE IF NOT EXISTS area_de_conhecimento (
+  ID VARCHAR(15),
+  descricao VARCHAR(13) NOT NULL,
+  PRIMARY KEY (ID)
+) ENGINE = InnoDB;
+
+-- TABELA CATEGORIZADO (N:N AREA_DE_CONHECIMENTO E LIVRO)
+CREATE TABLE IF NOT EXISTS categorizado (
+  Livro_ISBN VARCHAR(15) NOT NULL,
+  AreaConhecimento_ID VARCHAR(15),
+  PRIMARY KEY (Livro_ISBN, AreaConhecimento_ID),
+  FOREIGN KEY (Livro_ISBN) REFERENCES Livro (ISBN),
+  FOREIGN KEY (AreaConhecimento_ID) REFERENCES area_de_conhecimento (ID)
+) ENGINE = InnoDB;
+
+
+
+-- TABELA PALAVRA-CHAVE
+CREATE TABLE IF NOT EXISTS palavra_chave (
+  ID VARCHAR(15) NOT NULL,
+  descricao VARCHAR(50) NULL,
+  PRIMARY KEY (ID)
+) ENGINE = InnoDB;
+
+-- TABELA CONTEM (N:N palavra-chave e livro)
+CREATE TABLE IF NOT EXISTS contem (
+  Livro_ISBN VARCHAR(15) NOT NULL,
+  PalavraChave_ID VARCHAR(15) NOT NULL,
+  PRIMARY KEY (Livro_ISBN, PalavraChave_ID),
+  FOREIGN KEY (Livro_ISBN) REFERENCES Livro (ISBN),
+  FOREIGN KEY (PalavraChave_ID) REFERENCES palavra_chave (ID)
+) ENGINE = InnoDB;
+
+-- TABELA AUTOR
+CREATE TABLE IF NOT EXISTS autor (
+  ID VARCHAR(15) NOT NULL,
+  nome VARCHAR(100) NOT NULL,
+  biografia VARCHAR(100) NULL,
+  Nacionalidade VARCHAR(100) NULL,
+  Data_de_nascimento DATE NULL,
+  Obras VARCHAR(100) NOT NULL,
+  PRIMARY KEY (ID)
+) ENGINE = InnoDB;
+
+-- TABELA ESCRITO (N:N autor e livro)
+CREATE TABLE IF NOT EXISTS escrito (
+  Autor_ID VARCHAR(15) NOT NULL,
+  Livro_ISBN VARCHAR(15) NOT NULL,
+  PRIMARY KEY (Autor_ID, Livro_ISBN),
+  FOREIGN KEY (Autor_ID) REFERENCES autor (ID),
+  FOREIGN KEY (Livro_ISBN) REFERENCES Livro (ISBN)
+) ENGINE = InnoDB;
+
+-- TABELA EXEMPLAR
+CREATE TABLE IF NOT EXISTS exemplar (
+  Localizacao VARCHAR(15) NOT NULL,
+  estado VARCHAR(20) NOT NULL,
+  NS VARCHAR(15),
+  ISBN_livro VARCHAR(15) NOT NULL,
+  preco decimal (10,2) NOT NULL,
+  PRIMARY KEY (NS),
+  FOREIGN KEY (ISBN_livro) REFERENCES Livro (ISBN)
+) ENGINE = InnoDB;
+
+-- TABELA REGISTRAR (N:N pedidos_vendas e exemplar)
+CREATE TABLE IF NOT EXISTS registrar (
+  PedidoVenda_ID VARCHAR(15) NOT NULL,
+  Exemplar_NS VARCHAR(15) NOT NULL,
+  PRIMARY KEY (PedidoVenda_ID, Exemplar_NS),
+  FOREIGN KEY (PedidoVenda_ID) REFERENCES pedidos_vendas (ID),
+  FOREIGN KEY (Exemplar_NS) REFERENCES exemplar (NS)
+) ENGINE = InnoDB;
+
+
+Scripts de alterações na estrutura das tabelas:
+
+ALTER TABLE `editora`.`Livro`
+ADD `edicao` VARCHAR(10) NULL;
+
+ALTER TABLE `editora`.`Livro`
+MODIFY COLUMN `titulo` VARCHAR(50) NOT NULL;
+
+ALTER TABLE `editora`.`Livro`
+ADD `preco` DECIMAL(10, 2) NOT NULL;
+
+ALTER TABLE `editora`.`autor`
+ADD `website` VARCHAR(100) NULL;
+
+ALTER TABLE `editora`.`Livro`
+CHANGE `Numero_de_paginas` `num_paginas` INT NOT NULL;
+
+ALTER TABLE `editora`.`pedidos_vendas`
+ADD `numero_pedido` INT NOT NULL;
+
+ALTER TABLE `editora`.`Livro`
+ADD `ano_publicacao` YEAR NOT NULL;
+
+ALTER TABLE `editora`.`autor`
+ADD `data_nascimento` DATE NULL;
+
+ALTER TABLE `editora`.`cliente`
+MODIFY COLUMN `email` VARCHAR(50) NOT NULL;
+
+ALTER TABLE `editora`.`Livro`
+ADD `edicao` VARCHAR(10) NULL;
+
+ALTER TABLE `editora`.`Livro`
+MODIFY COLUMN `titulo` VARCHAR(50) NOT NULL;
+
+ALTER TABLE `editora`.`Livro`
+ADD `preco` DECIMAL(10, 2) NOT NULL;
+
+ALTER TABLE `editora`.`autor`
+ADD `website` VARCHAR(100) NULL;
+
+ALTER TABLE `editora`.`Livro`
+CHANGE `Numero_de_paginas` `num_paginas` INT NOT NULL;
+
+ALTER TABLE `editora`.`pedidos_vendas`
+ADD `numero_pedido` INT NOT NULL;
+
+ALTER TABLE `editora`.`Livro`
+ADD `ano_publicacao` YEAR NOT NULL;
+
+ALTER TABLE `editora`.`autor`
+ADD `data_nascimento` DATE NULL;
+
+ALTER TABLE `editora`.`cliente`
+MODIFY COLUMN `email` VARCHAR(50) NOT NULL;
+
+Inserts:
+
+INSERT INTO `editora`.`Livro` (`ISBN`, `titulo`, `Editora`, `data_de_publicacao`, `Numero_de_paginas`, `Genero`, `descricao`, `autor`) VALUES
+ ('123456', 'Macunaíma', 'Editora A', '2020-01-15', 250, 'Aventura', 'Clássico brasileiro.', 'Mário Andrade'),
+ ('234567', 'O Tempo e o Vento', 'Editora B', '2019-05-20', 400, 'Ficção', 'Saga do RS.', 'Erico Verissimo'),
+ ('345678', 'A Hora da Estrela', 'Editora C', 8'2021-11-10', 150, 'Drama', 'Último livro Clarice.', 'Clarice Lispector'),
+ ('456789', 'Memórias de Brás Cubas', 'Editora D', '2018-07-03', 280, 'Sátira', 'Obra-prima de Machado.', 'Machado de Assis'),
+ ('1232526', 'A Trança do Destino', 'PANINI', '2023-01-15', 300, 'Ficção', 'Trama misteriosa.', 'James Joyce'),
+ ('456725', 'Senhor dos Anéis', 'HarperCollins', '2020-09-05', 800, 'Fantasia', 'Épica jornada.', 'J.R.R. Tolkien'),
+ ('234159', '1984', 'Penguin Books', '2019-07-30', 328, 'Distopia', 'Mundo controlado.', 'George Orwell'),
+ ('531254', 'Cem Anos de Solidão', 'Editora Sudamericana', '2022-03-20', 368, 'Realismo Mágico', 'História de Macondo.', 'Gabriel García Márquez'),
+ ('201562', 'A Metamorfose', 'Franz Kafka', '2017-10-08', 200, 'Ficção', 'Transformação de Samsa.', 'Franz Kafka'),
+ ('765812', 'Crime e Castigo', 'Editora 34', '2018-06-12', 450, 'Romance', 'Culpa e punição.', 'Fiódor Dostoiévski'),
+ ('953469', 'Ulisses', 'Shakespeare', '2022-05-15', 736, 'Modernismo', 'Odisséia em Dublin.', 'James Joyce');
+
+
+INSERT INTO palavra_chave (ID, descricao) VALUES
+ ('1', 'Bruxo'),
+ ('2', 'Cabelo'),
+ ('3', 'Amor'),
+ ('4', 'Amizade'),
+ ('5', 'Paixão'),
+ ('6', 'Coragem'),
+ ('7', 'Espada'),
+ ('8', 'Floresta'),
+ ('9', 'Animais');
+
+INSERT INTO `editora`.`area_de_conhecimento` (`ID`, `descricao`) VALUES
+('101', 'Lit. BR'),
+('102', 'Lit. EST'),
+('103', 'Ficção C.'),
+('104', 'Romance H.'),
+('105', 'Fantasia'),
+('106', 'Biografia'),
+('107', 'História BR'),
+('108', 'Filosofia'),
+('109', 'Ciência/Tec'),
+('110', 'Autoajuda');
+
+
+INSERT INTO `editora`.`autor` (`ID`, `nome`, `biografia`, `Nacionalidade`, `Data_de_nascimento`, `Obras`) VALUES
+ ('MARIOAUTOR', 'Mário de Andrade', "Biografia do Mário de Andrade", 'Brasileira', '1893-10-09', 'Macunaíma –Sem carater'),
+ ('ERICOAUTOR', 'Erico Verissimo', 'Biografia do Erico Verissimo', 'Brasileira', '1905-12-17', 'O Tempo e o Vento'),
+ ('CLARICEAUTOR', 'Clarice Lispector', 'Biografia da Clarice Lispector', 'Brasileira', '1920-12-10', 'A Hora da Estrela'),
+ ('MACHADOAUTOR', 'Machado de Assis', 'Biografia do Machado de Assis', 'Brasileira', '1839-06-21', 'Memórias Póstumas'),
+ ('JAMESAUTOR', 'James Joyce', 'Biografia do James Joyce', 'Irlandesa', '1882-02-02', 'A Trança do Destino'),
+ ('TOLKIENAUTOR', 'J.R.R. Tolkien', 'Biografia do J.R.R. Tolkien', 'Britânica', '1892-01-03', 'O Senhor dos Anéis'),
+ ('ORWELLAUTOR', 'George Orwell', 'Biografia do George Orwell', 'Britânica', '1903-06-25', '1984'),
+ ('GABRIELAUTOR', 'Gabriel García Márquez', 'Biografia do Gabriel', 'Colombiana', '1927-03-06', 'Cem Anos de Solidão'),
+ ('KAFKAAUTOR', 'Franz Kafka', 'Biografia do Franz Kafka', 'Austríaca', '1883-07-03', 'A Metamorfose'),
+ ('DOSTOIEVSKIAUT', 'Fiódor Dostoiévski', 'Biografia do Fiódor Dostoiévski', 'Russa', '1821-11-11', 'Crime e Castigo');
+ 
+ INSERT INTO cliente (CPF, email, nome, endereco) VALUES
+('123.456.789-01', 'ana.silva@email.com', 'Ana Silva', 'Rua da Amizade, 123'),
+('987.654.321-02', 'joao.pereira@email.com', 'João Pereira', 'Avenida Principal, 456'),
+('555.555.555-03', 'maria.santos@email.com', 'Maria Santos', 'Rua da Paz, 789'),
+('789.123.456-04', 'carlos.ferreira@email.com', 'Carlos Ferreira', 'Praça Central, 987'),
+('234.567.890-05', 'sofia.carvalho@email.com', 'Sofia Carvalho', 'Avenida dos Sonhos, 654'),
+('876.543.210-06', 'pedro.gomes@email.com', 'Pedro Gomes', 'Rua das Flores, 321'),
+('321.765.432-07', 'laura.almeida@email.com', 'Laura Almeida', 'Praça da Liberdade, 234'),
+('654.321.098-08', 'andre.rodrigues@email.com', 'André Rodrigues', 'Avenida dos Negócios, 987'),
+('987.654.321-09', 'beatriz.costa@email.com', 'Beatriz Costa', 'Rua das Ondas, 222'),
+('111.222.333-10', 'miguel.lopes@email.com', 'Miguel Lopes', 'Avenida da Inovação, 555');
+
+INSERT INTO pedidos_vendas (ID, `data`, `status`, detalhe, CPF_cliente) VALUES
+('1', '2023-10-01', 'Em Processamento', 'Pedido "Macunaíma"', '123.456.789-01'),
+('2', '2023-10-02', 'Aguardando Pagto', 'Pedido "O Tempo e o Vento"', '987.654.321-02'),
+('3', '2023-10-03', 'Em Processamento', 'Pedido "Hora da Estrela"', '555.555.555-03'),
+('4', '2023-10-04', 'Enviado', 'Pedido "Memórias Póstumas"', '789.123.456-04'),
+('5', '2023-10-05', 'Entregue', 'Pedido "A Trança do Destino"', '234.567.890-05'),
+('6', '2023-10-06', 'Em Processamento', 'Pedido "O Senhor dos Anéis"', '789.123.456-04'),
+('7', '2023-10-07', 'Aguardando Pagto', 'Pedido "1984"', '111.222.333-10'),
+('8', '2023-10-08', 'Em Processamento', 'Pedido "Cem Anos de Solidão"', '111.222.333-10'),
+('9', '2023-10-09', 'Enviado', 'Pedido "A Metamorfose"', '987.654.321-09'),
+('10', '2023-10-10', 'Entregue', 'Pedido "Crime e Castigo"', '987.654.321-09');
+
+ 
+ INSERT INTO exemplar (Localizacao, estado, NS, ISBN_livro, preco) VALUES
+ ('Estante 1A', 'Reservado', '123456789012345', '123456', 40.99),
+ ('Estante 2B', 'Danificado', '234567890123456', '234567', 20.99),
+ ('Estante 3C', 'Disponível', '345678901234567', '345678', 80.15),
+ ('Estante 4D', 'Disponível', '456789012345678', '456789', 70.25),
+ ('Estante 5E', 'Reservado', '567890123456789', '765812', 89.99),
+ ('Estante 6F', 'Novo', '678901234567890', '1232526', 75.99),
+ ('Estante 7G', 'Usado', '789012345678901', '456725', 200.78),
+ ('Estante 8H', 'Novo', '890123456789012', '234159', 35.99),
+ ('Estante 9I', 'Usado', '901234567890123', '531254', 25.99),
+ ('Estante 10J', 'Novo', '012345678901234', '201562', 45.9);
+
+INSERT INTO departamento (ID, nome, responsavel, descricao) VALUES
+
+  ('001', 'Vendas', 'Francisca Silva', 'Departamento de vendas responsável por vendas de produtos'),
+  ('002', 'RH', 'Theo Pereira', 'Departamento de Recursos Humanos responsável por questões de pessoal'),
+  ('003', 'TI', 'Fernanda Santos', 'Departamento de Tecnologia da Informação responsável por infraestrutura e desenvolvimento'),
+  ('004', 'Financeiro', 'Danillo Ferreira', 'Departamento Financeiro responsável por contas e finanças'),
+  ('005', 'Marketing', 'Milena Carvalho', 'Departamento de Marketing responsável por promoções e publicidade'),
+  ('006', 'Serviços Gerais', 'João Gomes', 'Departamento de soluções, manutenção e conservação'),
+  ('007', 'Contabilidade', 'Ana Almeida', 'Departamento de Contabilidade responsável por contas e auditoria'),
+  ('008', 'Design', 'Marcos Rodrigues', 'Departamento de Design responsável por design gráfico e de produtos'),
+  ('009', 'Vendas', 'Luiza Costa', 'Departamento de vendas responsável por vendas de serviços'),
+  ('010', 'TI', 'Vanessa Lopes', 'Departamento de Tecnologia da Informação responsável por suporte técnico e rede');
+
+ 
+ INSERT INTO funcionario (ID, nome, telefone, endereco, cargo, ID_departamento, ID_pedidos_vendas) VALUES
+
+("101", "Pedro Campos", "(11) 1234-5678", "Rua da Amizade, 123", "Gerente de Vendas", "001","1"),
+("202", "João Pereira", "(21) 9876-5432", "Avenida Principal", "Analista de Marketing", "005","2"),
+("303", "Maria Santos", "(31) 5555-5555", "Rua da Paz, 789", "Auxiliar administrativo", "002","3"),
+("404", "Carlos Ferreira", "(41) 7891-2345", "Praça Central, 987", "Gerente de Recursos Humanos","002", "4"),
+("505", "Sofia Carvalho", "(51) 2345-6789", "Avenida dos Sonhos, 654", "Assistente Financeiro", "004", "5"),
+("606", "Pedro Gomes", "(61) 8765-4321", "Rua das Flores, 321", "Assistente de Marketing", "005", "6"),
+("707", "Laura Almeida", "(71) 3217-6543", "Praça da Liberdade, 234", "Contadora", "007", "7"),
+("808", "André Rodrigues", "(81) 6543-2109", "Avenida dos Negócios, 987", "Zelador", "006", "8"), 
+("909", "Beatriz Costa", "(91) 9876-5432", "Rua das Ondas, 222", "Consultor de Vendas", "009", "9"),
+("010", "Miguel Lopes", "(10) 1112-2223", "Avenida da Inovação, 555", "Técnico em TI", "010", "10");
+
+
+
+INSERT INTO escrito (Autor_ID, Livro_ISBN) VALUES
+    ('MARIOAUTOR', '123456'),
+    ('ERICOAUTOR', '234567'),
+    ('CLARICEAUTOR', '345678'),
+    ('MACHADOAUTOR', '456789'),
+    ('JAMESAUTOR', '1232526'),
+    ('TOLKIENAUTOR', '456725'),
+    ('ORWELLAUTOR', '234159'),
+    ('GABRIELAUTOR', '531254'),
+    ('KAFKAAUTOR', '201562'),
+    ('DOSTOIEVSKIAUT', '765812');
+
+INSERT INTO escrito (Autor_ID, Livro_ISBN) VALUES
+    ('MARIOAUTOR', '123456'),
+    ('ERICOAUTOR', '234567'),
+    ('CLARICEAUTOR', '345678'),
+    ('MACHADOAUTOR', '456789'),
+    ('JAMESAUTOR', '1232526'),
+    ('TOLKIENAUTOR', '456725'),
+    ('ORWELLAUTOR', '234159'),
+    ('GABRIELAUTOR', '531254'),
+    ('KAFKAAUTOR', '201562'),
+    ('DOSTOIEVSKIAUT', '765812');
+    
+    
+INSERT INTO registrar (PedidoVenda_ID, Exemplar_NS) VALUES
+('1', '123456789012345'),
+('2', '234567890123456'),
+('3', '345678901234567'),
+('4', '456789012345678'),
+('5', '567890123456789'),
+('6', '678901234567890'),
+('7', '789012345678901'),
+('8', '890123456789012'),
+('9', '901234567890123'),
+('10', '012345678901234');
+
+INSERT INTO contem (Livro_ISBN, PalavraChave_ID) VALUES
+('123456', '1'),
+('123456', '2'),
+('234567', '3'),
+('234567', '4'),
+('345678', '3'),
+('345678', '5'),
+('456789', '6'),
+('456789', '7'),
+('1232526', '8'),
+('1232526', '9'),
+('456725', '6'),
+('456725', '8'),
+('234159', '5'),
+('531254', '3'),
+('531254', '6'),
+('201562', '7'),
+('765812', '5'),
+('765812', '9'),
+('953469', '1'),
+('953469', '4');
+
+INSERT INTO categorizado (Livro_ISBN, AreaConhecimento_ID) VALUES
+('123456', '101'),
+('234567', '102'),
+('345678', '101'),
+('456789', '101'),
+('1232526', '103'),
+('456725', '105'),
+('234159', '103'),
+('531254', '107'),
+('201562', '103'),
+('765812', '104'),
+('953469', '101'),
+('953469', '108');
+
+
+
+Consultas/Relatórios:
+
+----- contar quantos livros existem na tabela "Livro" escritos por um autor específico cujo nome é "Nome do Autor". ----
+SELECT autor, COUNT(ISBN) AS "total de livros"
+FROM Livro
+WHERE autor = 'Mário Andrade';
+
+----- Mostra o titulo dos livros e o genero -----
+
+SELECT titulo, Genero
+FROM Livro;
+
+-----  Mostra o preço dos livros e i titulo ----
+SELECT Livro.ISBN, Livro.titulo, Exemplar.preco
+FROM Livro
+INNER JOIN Exemplar ON Livro.ISBN = Exemplar.ISBN_livro;
+
+----- Mostra o titulo e o autor ----
+SELECT ISBN, titulo, autor
+FROM Livro;
+
+----- Mostra os livros onde a data de publicação é inferior a 2022 -----
+SELECT *
+FROM Livro
+WHERE data_de_publicacao < '2022-01-01';
+
+----- Mostra tudo da tabela palavra chave
+SELECT *
+FROM palavra_chave;
+
+----- Mostra nome e nacionalidade do autor (britanica -------
+
+SELECT nome, Nacionalidade
+FROM autor
+WHERE nacionalidade LIKE 'Britânica';
+
+----- Mostra o nome, o departamento e o telefone de funcionario
+
+SELECT departamento.nome, funcionario.nome, funcionario.telefone
+FROM departamento
+INNER JOIN funcionario ON departamento.ID = funcionario.ID_departamento;
+
+
+----- Mostra os dados dos clientes -----
+
+SELECT *
+FROM cliente;
+
+----- Mostra o nome do funcionario e o departamento
+
+SELECT funcionario.nome, departamento.nome AS Departamento
+FROM funcionario
+INNER JOIN departamento ON funcionario.ID_departamento = departamento.ID;
+
+
+----- Mostra o numero de série do exemplar, o titulo do livro e o estado ------
+SELECT exemplar.NS, exemplar.estado, livro.titulo
+FROM exemplar
+INNER JOIN Livro ON exemplar.ISBN_livro = Livro.ISBN
+WHERE exemplar.ISBN_livro = '531254';
+
+
+----- Mostra o nome dos funcionarios e os cargos
+SELECT nome, cargo
+FROM funcionario;
+
+----- Mostra os pedidos que estão em processamento ------
+
+SELECT *
+FROM pedidos_vendas
+WHERE status = 'Em Processamento';
+
+----- Mostra todos os dados ta tabela pedidos_vendas ------
+SELECT * 
+FROM pedidos_vendas;
+
+----- Mostra o total de pagina dos livros ordenando pelo nome do auto ------
+SELECT autor, SUM(Numero_de_paginas) AS TotalPaginas
+FROM Livro
+GROUP BY autor;
+
+----- Mostra os livros que tem um "editora" -----
+
+SELECT *
+FROM Livro
+WHERE Editora LIKE 'Editora%';
+
+----- Mostra os livros com a data e o status do pedido
+SELECT Livro.titulo, pedidos_vendas.data, pedidos_vendas.status
+FROM Livro
+LEFT JOIN pedidos_vendas ON Livro.ISBN = pedidos_vendas.ID;
+
+----- Mostra o status do pedido, a data, o ID e o CPF do cliente
+SELECT pv.ID, pv.data, pv.status, c.CPF
+FROM pedidos_vendas pv
+JOIN cliente c ON pv.CPF_cliente = c.CPF
+WHERE c.nome LIKE 'A%'
+LIMIT 0, 1000;
+
+----- Mostra o titulo e o autor quando o numero de paginas é mais que 500 e a data de publicação é de 5 anos para a atual ------
+SELECT titulo, autor
+FROM Livro
+WHERE ISBN IN (
+  SELECT ISBN
+  FROM Livro
+  WHERE Numero_de_paginas > 500 AND data_de_publicacao >= DATE_SUB(CURDATE(), INTERVAL 5 YEAR)
+);
+
+----- Mostra a area do departamento e o nome do funcionario
+SELECT departamento.nome "area", funcionario.nome
+FROM departamento
+INNER JOIN funcionario ON departamento.ID = funcionario.ID_departamento;
+
+
+----- Mostra o CPF do cliente, a data, e os detalhes do pedido ------
+SELECT pedidos_vendas.ID, cliente.nome, cliente.CPF, pedidos_vendas.data, pedidos_vendas.detalhe
+FROM pedidos_vendas
+INNER JOIN cliente ON pedidos_vendas.CPF_cliente = cliente.CPF;
+
+
+----- Mostra o responsavel pelo departamento e o nome do departamento ----- 
+SELECT nome "nome do departamento", responsavel
+FROM departamento
+WHERE ID IN (
+  SELECT ID_departamento
+  FROM funcionario
+  WHERE cargo LIKE '%Gerente%'
+);
+
+
+----- chama a tabela livro e a tabela autor e mostra seus dados ------
+SELECT autor.nome, autor.Obras, livro.ISBN, livro.genero
+FROM autor
+INNER JOIN escrito ON autor.ID = escrito.Autor_ID
+INNER JOIN Livro ON livro.ISBN = escrito.Livro_ISBN;
+
+----- mostra as obras do autor, sua data de nascimento e sua nacionalidade ------
+SELECT Livro.titulo, autor.data_de_nascimento, autor.nacionalidade
+FROM Livro
+INNER JOIN escrito ON Livro.ISBN = escrito.Livro_ISBN
+INNER JOIN autor ON escrito.Autor_ID = autor.ID
+WHERE autor.nome = 'Erico Verissimo';
+
+
+
+
+
+
+UPDATES
+
+UPDATE Livro
+SET titulo = 'Novo Título do Livro'
+WHERE ISBN = '123456';
+
+UPDATE pedidos_vendas
+SET status = 'Enviado'
+WHERE ID = '1';
+
+UPDATE cliente
+SET email = 'novo.email@email.com'
+WHERE CPF = '123.456.789-01';
+
+DELETE FROM exemplar
+WHERE ISBN_livro = '123456';
+
+DELETE FROM funcionario
+WHERE ID_pedidos_vendas = '1';
+
+DELETE FROM exemplar
+WHERE NS = '123456789012345';
+
+UPDATE categorizado
+SET AreaConhecimento_ID = '102'
+WHERE Livro_ISBN = '123456';
+
+DELETE FROM contem
+WHERE Livro_ISBN = '123456' AND PalavraChave_ID = '1';
+
+UPDATE escrito
+SET Autor_ID = 'MACHADOAUTOR'
+WHERE Livro_ISBN = '234567';
+
+DELETE FROM pedidos_vendas
+WHERE CPF_cliente = '123.456.789-01';
+
+DELETE FROM exemplar
+WHERE Localizacao = 'Estante 1A';
+
+DELETE FROM escrito
+WHERE Autor_ID = 'MARIOAUTOR';
+
+UPDATE funcionario
+SET ID_departamento = '002'
+WHERE ID = '101';
+
+UPDATE funcionario
+SET ID_departamento = '001'
+WHERE ID_pedidos_vendas = '10';
+
+UPDATE categorizado
+SET AreaConhecimento_ID = '105'
+WHERE Livro_ISBN = '234567';
+
+UPDATE pedidos_vendas
+SET status = 'Cancelado'
+WHERE ID = '2';
+
+UPDATE funcionario
+SET telefone = '(11) 5555-5555'
+WHERE ID = '303';
+
+DELETE FROM area_de_conhecimento
+WHERE ID = '101';
+
+
+VIEW’s
+
+
+CREATE VIEW RelatorioPedidosPorCliente AS
+SELECT cliente.CPF, cliente.nome, COUNT(pedidos_vendas.ID) AS total_pedidos
+FROM cliente
+LEFT JOIN pedidos_vendas ON cliente.CPF = pedidos_vendas.CPF_cliente
+GROUP BY cliente.CPF, cliente.nome;
+
+CREATE VIEW RelatorioLivrosVendidos AS
+SELECT Livro.titulo, Livro.autor, COUNT(pedidos_vendas.ID) AS total_vendas
+FROM Livro
+JOIN exemplar ON Livro.ISBN = exemplar.ISBN_livro
+JOIN registrar ON exemplar.NS = registrar.Exemplar_NS
+JOIN pedidos_vendas ON registrar.PedidoVenda_ID = pedidos_vendas.ID
+WHERE pedidos_vendas.status = 'Entregue'
+GROUP BY Livro.titulo, Livro.autor;
+
+
+CREATE VIEW RelatorioFuncionariosPorDepartamento AS
+SELECT departamento.nome, COUNT(funcionario.ID) AS total_funcionarios
+FROM departamento
+LEFT JOIN funcionario ON departamento.ID = funcionario.ID_departamento
+GROUP BY departamento.nome;
+
+CREATE VIEW RelatorioExemplaresDisponiveis AS
+SELECT Livro.titulo, COUNT(exemplar.NS) AS exemplares_disponiveis
+FROM Livro
+LEFT JOIN exemplar ON Livro.ISBN = exemplar.ISBN_livro
+WHERE exemplar.estado = 'Disponível'
+GROUP BY Livro.titulo;
+
+CREATE VIEW RelatorioLivrosPorGenero AS
+SELECT Livro.Genero, COUNT(Livro.ISBN) AS total_livros
+FROM Livro
+GROUP BY Livro.Genero;
+
+CREATE VIEW RelatorioPedidosAguardandoPagamento AS
+SELECT pedidos_vendas.ID, cliente.nome AS cliente, pedidos_vendas.detalhe
+FROM pedidos_vendas
+JOIN cliente ON pedidos_vendas.CPF_cliente = cliente.CPF
+WHERE pedidos_vendas.status = 'Aguardando Pagto';
+
+
+CREATE VIEW RelatorioExemplaresPorLocalizacao AS
+SELECT exemplar.Localizacao, COUNT(exemplar.NS) AS total_exemplares
+FROM exemplar
+GROUP BY exemplar.Localizacao;
+
+CREATE VIEW RelatorioAutoresComBiografia AS
+SELECT autor.nome, autor.biografia
+FROM autor
+WHERE autor.biografia IS NOT NULL;
+
+CREATE VIEW RelatorioLivrosPorEditora AS
+SELECT Livro.Editora, COUNT(Livro.ISBN) AS total_livros
+FROM Livro
+GROUP BY Livro.Editora;
+
+
+CREATE VIEW RelatorioPedidosEnviados AS
+SELECT pedidos_vendas.ID, cliente.nome AS cliente, pedidos_vendas.data
+FROM pedidos_vendas
+JOIN cliente ON pedidos_vendas.CPF_cliente = cliente.CPF
+WHERE pedidos_vendas.status = 'Enviado';
+
+SELECT * FROM RelatorioPedidosPorCliente;
